@@ -15,6 +15,3 @@ scrape_configs:
     static_configs:
       - targets: ["metrics-app:8000"]
 
-  - job_name: 'alertmanager'
-    static_configs:
-      - targets: ['alertmanager:9093']

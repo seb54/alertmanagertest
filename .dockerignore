@@ -1,0 +1,57 @@
+# Fichiers d'environnement et secrets
+.env
+.env.*
+!.env.example
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Fichiers d'IDE et éditeurs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs et données
+*.log
+data/
+logs/
+
+# Fichiers Git
+.git
+.gitignore
+
+# Fichiers Docker
+.docker/
+docker-compose*.yml
+Dockerfile*
+!app/Dockerfile
+
+# Documentation
+README.md
+docs/
+*.md 

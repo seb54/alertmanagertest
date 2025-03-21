@@ -1,0 +1,66 @@
+networks:
+  monitoring:
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert_rules.yml:/etc/prometheus/alert_rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - alertmanager
+      - metrics-app
+    networks:
+      - monitoring
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.template.yml
+    entrypoint:
+      - sh
+      - -c
+      - "cat /etc/alertmanager/alertmanager.template.yml | sed 's/\\$${SMTP_FROM}/${SMTP_FROM}/g; s/\\$${SMTP_HOST}/${SMTP_HOST}/g; s/\\$${SMTP_USERNAME}/${SMTP_USERNAME}/g; s/\\$${SMTP_PASSWORD}/${SMTP_PASSWORD}/g; s/\\$${NOTIFICATION_EMAIL}/${NOTIFICATION_EMAIL}/g; s/\\$${SMTP_HELLO}/${SMTP_HELLO}/g' > /etc/alertmanager/alertmanager.yml && /bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml"
+    ports:
+      - "9093:9093"
+    environment:
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - NOTIFICATION_EMAIL=${NOTIFICATION_EMAIL}
+      - SMTP_HELLO=${SMTP_HELLO}
+    env_file:
+      - .env
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+  metrics-app:
+    build: 
+      context: ./app
+    container_name: metrics-app
+    ports:
+      - "8080:8000"
+    networks:
+      - monitoring

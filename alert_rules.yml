@@ -1,0 +1,11 @@
+groups:
+  - name: temperature_alerts
+    rules:
+      - alert: HighTemperature
+        expr: temperature{job="metrics-app"} > 70
+        for: 5s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Température élevée détectée"
+          description: "La température a dépassé 70°C pendant plus de 5 secondes. Température actuelle : {{ $value }}°C"
